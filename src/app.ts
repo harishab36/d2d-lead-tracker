@@ -1,9 +1,11 @@
 import type { ViewKey } from './types';
+import { PRODUCTS } from './constants';
 import { state } from './store';
 import { renderDashboard } from './screens/dashboard';
 import { initLeadsTable, renderLeadsTable } from './screens/leads';
 import { initLeadForm, openAddForm, openEditForm, prefillVoiceData } from './screens/leadForm';
 import { startVoice, isVoiceSupported } from './screens/voice';
+import type { VoiceField } from './screens/voice';
 import { initDeleteModal, openDeleteModal, closeDeleteModal } from './screens/deleteModal';
 import { initSettings, renderSettings, applyTheme, getSavedTheme } from './screens/settings';
 import { isLoggedIn, logout, initLogin } from './screens/login';
@@ -109,13 +111,24 @@ function goToSettings(): void {
 
 // ── Voice toast ───────────────────────────────────────────────────────────────
 
+const FIELD_LABEL: Record<VoiceField, string> = {
+  name: 'Name', phone: 'Phone', email: 'Email', product: 'Product',
+};
+
 let _voiceToastTimer = 0;
 
-function showVoiceToast(msg: string, duration = 0): void {
+function esc(s: string): string {
+  return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+function showVoiceToast(line1: string, line2 = '', duration = 0): void {
   const el = document.getElementById('voice-toast')!;
-  el.textContent = msg;
-  el.classList.toggle('visible', !!msg);
   clearTimeout(_voiceToastTimer);
+  if (!line1) { el.classList.remove('visible'); return; }
+  el.innerHTML = line2
+    ? `<span class="vt-line1">${esc(line1)}</span><span class="vt-line2">${esc(line2)}</span>`
+    : `<span class="vt-line1">${esc(line1)}</span>`;
+  el.classList.add('visible');
   if (duration) _voiceToastTimer = window.setTimeout(() => el.classList.remove('visible'), duration);
 }
 
@@ -228,25 +241,49 @@ export function boot(): void {
   } else {
     btnVoice.addEventListener('click', () => {
       startVoice(
-        (s, secsLeft) => {
-          btnVoice.classList.toggle('listening',   s === 'listening');
-          btnVoice.classList.toggle('processing',  s === 'processing');
-          showVoiceToast(
-            s === 'listening'  ? `Listening… tap to stop (${secsLeft ?? 0}s)` :
-            s === 'processing' ? 'Processing…' : '',
-          );
+        (s, secsLeft, partial, field) => {
+          btnVoice.classList.toggle('listening',  s === 'listening');
+          btnVoice.classList.toggle('processing', s === 'processing');
+
+          if (s === 'idle') { showVoiceToast(''); return; }
+
+          const fieldLabel = field ? FIELD_LABEL[field] : '';
+          const header = s === 'listening'
+            ? `🎤 Say ${fieldLabel}… (${secsLeft ?? 0}s)  ·  tap to stop`
+            : `⏳ ${fieldLabel}…`;
+
+          // Summarise what has been captured so far
+          const captured = (['name', 'phone', 'email', 'product'] as VoiceField[])
+            .map(f => {
+              const v = (partial as any)?.[f] as string | undefined;
+              if (!v) return null;
+              const val = f === 'product' ? PRODUCTS[v as keyof typeof PRODUCTS] ?? v : v;
+              return `${FIELD_LABEL[f]}: ${val}`;
+            })
+            .filter(Boolean)
+            .join('  ·  ');
+
+          showVoiceToast(header, captured);
         },
-        (lead, raw) => {
+        (lead, _raw) => {
           state.previousView  = state.view as 'dashboard' | 'leads';
           state.editingLeadId = null;
           openAddForm();
           prefillVoiceData(lead);
           showView('lead-form');
-          const parts = [lead.name, lead.phone, lead.product.replace('_', ' ')].filter(Boolean);
-          showVoiceToast(parts.length ? `Captured: ${parts.join(' · ')}` : `Heard: "${raw}"`, 4000);
+          const parts = [
+            lead.name,
+            lead.phone,
+            lead.product ? (PRODUCTS[lead.product as keyof typeof PRODUCTS] ?? lead.product) : '',
+          ].filter(Boolean);
+          showVoiceToast(
+            parts.length ? `Captured: ${parts.join(' · ')}` : 'Voice captured!',
+            '',
+            4_000,
+          );
           (document.getElementById('form-name') as HTMLInputElement).focus();
         },
-        msg => showVoiceToast(msg, 3000),
+        msg => showVoiceToast(msg, '', 3_000),
       );
     });
   }

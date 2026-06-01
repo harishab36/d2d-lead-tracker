@@ -490,27 +490,39 @@ body {
   position: fixed;
   top: var(--topbar-h);
   left: 50%;
-  -webkit-transform: translateX(-50%) translateY(-4px);
-  transform: translateX(-50%) translateY(-4px);
+  transform: translateX(-50%) translateY(-6px);
   background: var(--gray-900);
   color: #fff;
-  font-size: 13px;
-  font-weight: 500;
-  padding: 8px 18px;
-  border-radius: 0 0 10px 10px;
+  padding: 10px 20px 12px;
+  border-radius: 0 0 14px 14px;
   z-index: 200;
   opacity: 0;
   pointer-events: none;
-  white-space: nowrap;
-  max-width: 90vw;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  transition: opacity .2s, -webkit-transform .2s, transform .2s;
+  max-width: min(420px, 94vw);
+  width: max-content;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  transition: opacity .2s, transform .2s;
 }
 #voice-toast.visible {
   opacity: 1;
-  -webkit-transform: translateX(-50%) translateY(0);
   transform: translateX(-50%) translateY(0);
+}
+.vt-line1 {
+  font-size: 13px;
+  font-weight: 600;
+  white-space: nowrap;
+  letter-spacing: .01em;
+}
+.vt-line2 {
+  font-size: 11.5px;
+  font-weight: 400;
+  opacity: .8;
+  white-space: normal;
+  word-break: break-word;
+  line-height: 1.4;
 }
 
 /* ── form-mode topbar swap ───────────────────── */
