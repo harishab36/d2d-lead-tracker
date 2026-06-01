@@ -4,11 +4,17 @@ import { renderDashboard } from './screens/dashboard';
 import { initLeadsTable, renderLeadsTable } from './screens/leads';
 import { initLeadForm, openAddForm, openEditForm } from './screens/leadForm';
 import { initDeleteModal, openDeleteModal, closeDeleteModal } from './screens/deleteModal';
+import { initSettings, renderSettings, applyTheme, getSavedTheme } from './screens/settings';
+import { isLoggedIn, logout, initLogin } from './screens/login';
+
+// ── Core render ───────────────────────────────────────────────────────────────
 
 function renderAll(): void {
   renderDashboard();
   if (state.view === 'leads') renderLeadsTable();
 }
+
+// ── Sidebar ───────────────────────────────────────────────────────────────────
 
 function closeSidebar(): void {
   document.getElementById('sidebar')!.classList.remove('open');
@@ -23,12 +29,23 @@ function toggleSidebar(): void {
   overlay.classList.toggle('active', !isOpen);
 }
 
+// ── Profile dropdown ──────────────────────────────────────────────────────────
+
+function closeProfileDropdown(): void {
+  document.getElementById('profile-dropdown')!.classList.remove('open');
+}
+
+// ── View routing ──────────────────────────────────────────────────────────────
+
 function showView(view: ViewKey, filterProduct = ''): void {
   state.view = view;
-  if (filterProduct && view !== 'lead-form') state.filterProduct = filterProduct;
+  if (filterProduct && view !== 'lead-form' && view !== 'settings') {
+    state.filterProduct = filterProduct;
+  }
 
-  // Toggle form-mode on <body> — controls back button, hamburger, add-lead button
-  document.body.classList.toggle('form-mode', view === 'lead-form');
+  // form-mode swaps topbar chrome (back button ↔ hamburger + add-lead)
+  const useBackButton = view === 'lead-form' || view === 'settings';
+  document.body.classList.toggle('form-mode', useBackButton);
 
   document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
   document.getElementById(`view-${view}`)!.classList.add('active');
@@ -37,11 +54,13 @@ function showView(view: ViewKey, filterProduct = ''): void {
     dashboard:   'Dashboard',
     leads:       'All Leads',
     'lead-form': state.editingLeadId ? 'Edit Lead' : 'Add Lead',
+    settings:    'Settings',
   };
   document.getElementById('page-title')!.textContent = titles[view];
 
-  if (view !== 'lead-form') {
-    document.querySelectorAll('.nav-item').forEach(a => a.classList.remove('active'));
+  // Nav active state only applies to sidebar views
+  document.querySelectorAll('.nav-item').forEach(a => a.classList.remove('active'));
+  if (view === 'dashboard' || view === 'leads') {
     const activeNav = document.querySelector(
       `.nav-item[data-view="${view}"]${filterProduct
         ? `[data-filter-product="${filterProduct}"]`
@@ -50,13 +69,18 @@ function showView(view: ViewKey, filterProduct = ''): void {
     if (activeNav) activeNav.classList.add('active');
   }
 
-  if (view === 'leads') {
-    (document.getElementById('filter-product') as HTMLSelectElement).value = state.filterProduct;
-    renderLeadsTable();
-  }
+  if (view === 'leads')    { (document.getElementById('filter-product') as HTMLSelectElement).value = state.filterProduct; renderLeadsTable(); }
   if (view === 'dashboard') renderDashboard();
+  if (view === 'settings')  renderSettings();
 
   closeSidebar();
+  closeProfileDropdown();
+}
+
+// ── Navigation helpers ────────────────────────────────────────────────────────
+
+function goBack(): void {
+  showView(state.previousView);
 }
 
 function goToAddForm(): void {
@@ -75,17 +99,48 @@ function goToEditForm(id: string): void {
   (document.getElementById('form-name') as HTMLInputElement).focus();
 }
 
-function goBack(): void {
-  showView(state.previousView);
+function goToSettings(): void {
+  if (state.view === 'dashboard' || state.view === 'leads') {
+    state.previousView = state.view;
+  }
+  showView('settings');
 }
 
+// ── Auth screen helpers ───────────────────────────────────────────────────────
+
+function showLoginScreen(): void {
+  document.getElementById('app')!.style.display          = 'none';
+  document.getElementById('login-screen')!.style.display = '';
+  (document.getElementById('login-username') as HTMLInputElement).value = '';
+  (document.getElementById('login-password') as HTMLInputElement).value = '';
+  document.getElementById('login-error')!.textContent = '';
+  (document.getElementById('login-username') as HTMLInputElement).focus();
+}
+
+function hideLoginScreen(): void {
+  document.getElementById('login-screen')!.style.display = 'none';
+  document.getElementById('app')!.style.display          = '';
+}
+
+// ── Boot ──────────────────────────────────────────────────────────────────────
+
 export function boot(): void {
-  // Wire up screen modules — no circular imports
+  // Apply persisted theme before anything renders
+  applyTheme(getSavedTheme());
+
+  // Login form — callback fires after successful credential check
+  initLogin(() => {
+    hideLoginScreen();
+    showView('dashboard');
+  });
+
+  // App screen modules
   initLeadsTable(goToEditForm, openDeleteModal, renderAll);
   initLeadForm(goBack);
   initDeleteModal(renderAll);
+  initSettings();
 
-  // Nav items
+  // Sidebar nav links
   document.querySelectorAll<HTMLElement>('.nav-item[data-view]').forEach(a => {
     a.addEventListener('click', e => {
       e.preventDefault();
@@ -108,15 +163,28 @@ export function boot(): void {
     showView('leads');
   });
 
-  // Hamburger (mobile)
+  // Hamburger / sidebar overlay (mobile)
   document.getElementById('btn-menu')!.addEventListener('click', toggleSidebar);
   document.getElementById('sidebar-overlay')!.addEventListener('click', closeSidebar);
 
-  // Back button
+  // Back button (lead-form + settings views)
   document.getElementById('btn-back')!.addEventListener('click', goBack);
 
   // Add lead button
   document.getElementById('btn-add-lead')!.addEventListener('click', goToAddForm);
+
+  // Profile dropdown
+  document.getElementById('btn-profile')!.addEventListener('click', e => {
+    e.stopPropagation();
+    document.getElementById('profile-dropdown')!.classList.toggle('open');
+  });
+  document.addEventListener('click', closeProfileDropdown);
+
+  document.getElementById('btn-settings-nav')!.addEventListener('click', goToSettings);
+  document.getElementById('btn-logout')!.addEventListener('click', () => {
+    logout();
+    showLoginScreen();
+  });
 
   // Leads filters
   document.getElementById('search-input')!.addEventListener('input', e => {
@@ -132,13 +200,19 @@ export function boot(): void {
     renderLeadsTable();
   });
 
-  // Escape: go back on form view, close delete modal elsewhere
+  // Escape key
   document.addEventListener('keydown', e => {
     if (e.key === 'Escape') {
-      if (state.view === 'lead-form') goBack();
+      if (state.view === 'lead-form' || state.view === 'settings') goBack();
       else closeDeleteModal();
     }
   });
 
-  showView('dashboard');
+  // Auth gate
+  if (isLoggedIn()) {
+    hideLoginScreen();
+    showView('dashboard');
+  } else {
+    showLoginScreen();
+  }
 }

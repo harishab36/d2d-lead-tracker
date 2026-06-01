@@ -1,6 +1,6 @@
 export type ProductKey = 'credit_card' | 'personal_loan' | 'home_loan' | 'savings_fd';
-export type StatusKey = 'new' | 'contacted' | 'converted';
-export type ViewKey = 'dashboard' | 'leads' | 'lead-form';
+export type StatusKey  = 'new' | 'contacted' | 'converted';
+export type ViewKey    = 'dashboard' | 'leads' | 'lead-form' | 'settings';
 
 export interface Lead {
   id: string;
