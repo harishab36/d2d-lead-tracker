@@ -2,7 +2,8 @@ import type { ViewKey } from './types';
 import { state } from './store';
 import { renderDashboard } from './screens/dashboard';
 import { initLeadsTable, renderLeadsTable } from './screens/leads';
-import { initLeadForm, openAddForm, openEditForm } from './screens/leadForm';
+import { initLeadForm, openAddForm, openEditForm, prefillVoiceData } from './screens/leadForm';
+import { startVoice, isVoiceSupported } from './screens/voice';
 import { initDeleteModal, openDeleteModal, closeDeleteModal } from './screens/deleteModal';
 import { initSettings, renderSettings, applyTheme, getSavedTheme } from './screens/settings';
 import { isLoggedIn, logout, initLogin } from './screens/login';
@@ -106,6 +107,18 @@ function goToSettings(): void {
   showView('settings');
 }
 
+// ── Voice toast ───────────────────────────────────────────────────────────────
+
+let _voiceToastTimer = 0;
+
+function showVoiceToast(msg: string, duration = 0): void {
+  const el = document.getElementById('voice-toast')!;
+  el.textContent = msg;
+  el.classList.toggle('visible', !!msg);
+  clearTimeout(_voiceToastTimer);
+  if (duration) _voiceToastTimer = window.setTimeout(() => el.classList.remove('visible'), duration);
+}
+
 // ── Auth screen helpers ───────────────────────────────────────────────────────
 
 function showLoginScreen(): void {
@@ -207,6 +220,36 @@ export function boot(): void {
       else closeDeleteModal();
     }
   });
+
+  // Voice capture
+  const btnVoice = document.getElementById('btn-voice')!;
+  if (!isVoiceSupported()) {
+    btnVoice.style.display = 'none';
+  } else {
+    btnVoice.addEventListener('click', () => {
+      startVoice(
+        s => {
+          btnVoice.classList.toggle('listening',   s === 'listening');
+          btnVoice.classList.toggle('processing',  s === 'processing');
+          showVoiceToast(
+            s === 'listening'  ? 'Listening… say name, phone, email and product' :
+            s === 'processing' ? 'Processing…' : '',
+          );
+        },
+        (lead, raw) => {
+          state.previousView  = state.view as 'dashboard' | 'leads';
+          state.editingLeadId = null;
+          openAddForm();
+          prefillVoiceData(lead);
+          showView('lead-form');
+          const parts = [lead.name, lead.phone, lead.product.replace('_', ' ')].filter(Boolean);
+          showVoiceToast(parts.length ? `Captured: ${parts.join(' · ')}` : `Heard: "${raw}"`, 4000);
+          (document.getElementById('form-name') as HTMLInputElement).focus();
+        },
+        msg => showVoiceToast(msg, 3000),
+      );
+    });
+  }
 
   // Auth gate
   if (isLoggedIn()) {

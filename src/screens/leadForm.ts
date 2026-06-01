@@ -86,6 +86,13 @@ function validateForm(): boolean {
   return valid;
 }
 
+export function prefillVoiceData(data: { name: string; phone: string; email: string; product: ProductKey | '' }): void {
+  if (data.name)    (document.getElementById('form-name')    as HTMLInputElement).value  = data.name;
+  if (data.phone)   (document.getElementById('form-phone')   as HTMLInputElement).value  = data.phone;
+  if (data.email)   (document.getElementById('form-email')   as HTMLInputElement).value  = data.email;
+  if (data.product) (document.getElementById('form-product') as HTMLSelectElement).value = data.product;
+}
+
 function handleFormSubmit(e: Event): void {
   e.preventDefault();
   if (!validateForm()) return;
