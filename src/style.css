@@ -469,6 +469,7 @@ body {
 }
 .modal-overlay.hidden { display: none; }
 
+@-webkit-keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
 .modal {
@@ -477,13 +478,23 @@ body {
   width: 100%;
   max-width: 560px;
   box-shadow: var(--shadow-lg);
-  animation: slideUp .2s ease;
+  position: relative;
+  -webkit-transform: translateZ(0);
+  transform: translateZ(0);
+  -webkit-animation: slideUp .2s ease both;
+  animation: slideUp .2s ease both;
 }
 .modal-sm { max-width: 380px; }
 
+/* opacity intentionally excluded — starting from opacity:0 causes Android WebView
+   to leave the modal invisible when the animation fails to fire after display:none→flex */
+@-webkit-keyframes slideUp {
+  from { -webkit-transform: translateY(12px) translateZ(0); transform: translateY(12px) translateZ(0); }
+  to   { -webkit-transform: translateY(0)    translateZ(0); transform: translateY(0)    translateZ(0); }
+}
 @keyframes slideUp {
-  from { opacity: 0; transform: translateY(12px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from { transform: translateY(12px) translateZ(0); }
+  to   { transform: translateY(0)    translateZ(0); }
 }
 
 .modal-header {
@@ -595,6 +606,50 @@ body {
 .btn-menu:hover { background: var(--gray-100); }
 .btn-menu svg { width: 20px; height: 20px; }
 
+/* ── Back button (hidden unless form-mode) ─── */
+.btn-back {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px; height: 36px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--gray-600);
+  cursor: pointer;
+  flex-shrink: 0;
+  touch-action: manipulation;
+  transition: background .15s;
+}
+.btn-back svg { width: 20px; height: 20px; }
+.btn-back:hover { background: var(--gray-100); }
+
+/* ── form-mode: topbar chrome swap ──────────── */
+.form-mode .btn-menu     { display: none !important; }
+.form-mode .btn-back     { display: flex; }
+.form-mode #btn-add-lead { display: none; }
+
+/* ── Lead form page ─────────────────────────── */
+.form-page {
+  max-width: 680px;
+  margin: 0 auto;
+}
+
+.lead-form-body {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding-top: 20px;
+  border-top: 1px solid var(--gray-100);
+  margin-top: 8px;
+}
+
 /* ── Mobile sidebar overlay ─────────────────── */
 .sidebar-overlay {
   display: none;
@@ -698,6 +753,18 @@ body {
   }
   .form-row .form-group { margin-bottom: 14px; }
   .form-row .form-group:last-child { margin-bottom: 0; }
+
+  /* lead form page on mobile */
+  .lead-form-body { padding: 16px; }
+  .form-actions {
+    flex-direction: column-reverse;
+    gap: 10px;
+    margin-top: 4px;
+  }
+  .form-actions .btn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 /* ── Small mobile: ≤480px ────────────────────── */
