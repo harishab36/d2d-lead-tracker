@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>D2D Lead Tracker</title>
+  </head>
+  <body>
+    <div id="app">
+      <!-- Mobile sidebar overlay -->
+      <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+          <div class="logo">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+              <rect width="28" height="28" rx="8" fill="#2563eb"/>
+              <path d="M7 14h4l3-7 3 14 3-7h1" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <span>D2D Leads</span>
+          </div>
+        </div>
+        <nav class="sidebar-nav">
+          <a href="#" class="nav-item active" data-view="dashboard">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path d="M3 4a1 1 0 011-1h12a1 1 0 011 1v2a1 1 0 01-1 1H4a1 1 0 01-1-1V4zM3 10a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H4a1 1 0 01-1-1v-6zM14 9a1 1 0 00-1 1v6a1 1 0 001 1h2a1 1 0 001-1v-6a1 1 0 00-1-1h-2z"/></svg>
+            Dashboard
+          </a>
+          <a href="#" class="nav-item" data-view="leads">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
+            All Leads
+          </a>
+          <div class="nav-section-label">By Product</div>
+          <a href="#" class="nav-item" data-view="leads" data-filter-product="credit_card">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z"/><path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd"/></svg>
+            Credit Cards
+          </a>
+          <a href="#" class="nav-item" data-view="leads" data-filter-product="personal_loan">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8a2 2 0 012 2v12a1 1 0 110 2h-3a1 1 0 01-1-1v-2a1 1 0 00-1-1H9a1 1 0 00-1 1v2a1 1 0 01-1 1H4a1 1 0 110-2V4zm3 1h2v2H7V5zm2 4H7v2h2V9zm2-4h2v2h-2V5zm2 4h-2v2h2V9z" clip-rule="evenodd"/></svg>
+            Personal Loans
+          </a>
+          <a href="#" class="nav-item" data-view="leads" data-filter-product="home_loan">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
+            Home Loans
+          </a>
+          <a href="#" class="nav-item" data-view="leads" data-filter-product="savings_fd">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"/></svg>
+            Savings / FD
+          </a>
+        </nav>
+      </aside>
+
+      <!-- Main content -->
+      <main class="main">
+        <!-- Top bar -->
+        <header class="topbar">
+          <div class="topbar-left">
+            <button class="btn-menu" id="btn-menu" aria-label="Open menu">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 5a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 10a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zM3 15a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"/></svg>
+            </button>
+            <h1 class="page-title" id="page-title">Dashboard</h1>
+          </div>
+          <div class="topbar-right">
+            <button class="btn btn-primary" id="btn-add-lead">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clip-rule="evenodd"/></svg>
+              <span class="btn-label">Add Lead</span>
+            </button>
+          </div>
+        </header>
+
+        <!-- Dashboard View -->
+        <section id="view-dashboard" class="view active">
+          <div class="stats-grid" id="stats-grid"></div>
+          <div class="dashboard-bottom">
+            <div class="card">
+              <div class="card-header">
+                <h2>Recent Leads</h2>
+                <a href="#" class="link" data-view="leads">View all</a>
+              </div>
+              <div id="recent-leads-table"></div>
+            </div>
+            <div class="card">
+              <div class="card-header"><h2>Pipeline Summary</h2></div>
+              <div id="pipeline-chart"></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Leads View -->
+        <section id="view-leads" class="view">
+          <div class="leads-toolbar">
+            <div class="search-wrap">
+              <svg class="search-icon" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/></svg>
+              <input type="text" id="search-input" placeholder="Search by name, phone, email…" class="search-input" />
+            </div>
+            <select id="filter-product" class="select-filter">
+              <option value="">All Products</option>
+              <option value="credit_card">Credit Cards</option>
+              <option value="personal_loan">Personal Loans</option>
+              <option value="home_loan">Home Loans</option>
+              <option value="savings_fd">Savings / FD</option>
+            </select>
+            <select id="filter-status" class="select-filter">
+              <option value="">All Statuses</option>
+              <option value="new">New</option>
+              <option value="contacted">Contacted</option>
+              <option value="converted">Converted</option>
+            </select>
+          </div>
+          <div class="card">
+            <div id="leads-table-container"></div>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <!-- Add / Edit Lead Modal -->
+    <div id="modal-overlay" class="modal-overlay hidden">
+      <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+        <div class="modal-header">
+          <h2 id="modal-title">Add Lead</h2>
+          <button class="modal-close" id="modal-close" aria-label="Close">&times;</button>
+        </div>
+        <form id="lead-form" class="modal-body" novalidate>
+          <input type="hidden" id="form-id" />
+          <div class="form-row">
+            <div class="form-group">
+              <label for="form-name">Full Name <span class="required">*</span></label>
+              <input type="text" id="form-name" placeholder="e.g. Anita Sharma" required />
+              <span class="field-error" id="err-name"></span>
+            </div>
+            <div class="form-group">
+              <label for="form-phone">Phone <span class="required">*</span></label>
+              <input type="tel" id="form-phone" placeholder="e.g. 9876543210" required />
+              <span class="field-error" id="err-phone"></span>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="form-email">Email</label>
+              <input type="email" id="form-email" placeholder="e.g. anita@email.com" />
+              <span class="field-error" id="err-email"></span>
+            </div>
+            <div class="form-group">
+              <label for="form-product">Product <span class="required">*</span></label>
+              <select id="form-product" required>
+                <option value="">Select a product</option>
+                <option value="credit_card">Credit Card</option>
+                <option value="personal_loan">Personal Loan</option>
+                <option value="home_loan">Home Loan / Mortgage</option>
+                <option value="savings_fd">Savings / FD Account</option>
+              </select>
+              <span class="field-error" id="err-product"></span>
+            </div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label for="form-status">Status <span class="required">*</span></label>
+              <select id="form-status" required>
+                <option value="new">New</option>
+                <option value="contacted">Contacted</option>
+                <option value="converted">Converted</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="form-amount">Loan / Limit Amount (₹)</label>
+              <input type="number" id="form-amount" placeholder="e.g. 500000" min="0" />
+            </div>
+          </div>
+          <div class="form-group full-width">
+            <label for="form-notes">Notes</label>
+            <textarea id="form-notes" rows="3" placeholder="Any additional details…"></textarea>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" id="btn-cancel">Cancel</button>
+            <button type="submit" class="btn btn-primary" id="btn-save">Save Lead</button>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Delete confirm modal -->
+    <div id="delete-overlay" class="modal-overlay hidden">
+      <div class="modal modal-sm" role="dialog" aria-modal="true">
+        <div class="modal-header">
+          <h2>Delete Lead?</h2>
+          <button class="modal-close" id="delete-close">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p>This action cannot be undone. The lead record will be permanently removed.</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" id="btn-delete-cancel">Cancel</button>
+          <button type="button" class="btn btn-danger" id="btn-delete-confirm">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
