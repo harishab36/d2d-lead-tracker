@@ -228,11 +228,11 @@ export function boot(): void {
   } else {
     btnVoice.addEventListener('click', () => {
       startVoice(
-        s => {
+        (s, secsLeft) => {
           btnVoice.classList.toggle('listening',   s === 'listening');
           btnVoice.classList.toggle('processing',  s === 'processing');
           showVoiceToast(
-            s === 'listening'  ? 'Listening… say name, phone, email and product' :
+            s === 'listening'  ? `Listening… tap to stop (${secsLeft ?? 0}s)` :
             s === 'processing' ? 'Processing…' : '',
           );
         },
